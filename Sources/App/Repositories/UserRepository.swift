@@ -37,6 +37,13 @@ final class UserRepository {
             .first()
     }
     
+    /// Finds the first matching user entity by the given email address
+    func find(role: UserModel.Roles) async throws -> [UserEntity] {
+        return try await database.query(UserEntity.self)
+            .filter(\.$role == role.rawValue)
+            .all()
+    }
+    
     /// Finds all user entities
     func find() async throws -> [UserEntity] {
         

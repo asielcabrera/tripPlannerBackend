@@ -32,21 +32,9 @@ final class AssetEntity: Model, @unchecked Sendable {
     
     @OptionalField(key: "fileSize")
     var fileSize: Int?
-    
-//    @OptionalChild(for: \.$thumbnail)
-//    var article: ArticleEntity?
-//    
-//    @OptionalChild(for: \.$thumbnail)
-//    var solution: ProjectEntity?
-    
+        
     @OptionalChild(for: \.$avatar)
     var user: UserEntity?
-    
-//    @Siblings(through: ProjectAsset.self, from: \.$asset, to: \.$project)
-//    var projects: [ProjectEntity]
-//    
-//    @Siblings(through: ArticleAsset.self, from: \.$asset, to: \.$article)
-//    var articles: [ArticleEntity]
     
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?

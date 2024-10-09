@@ -14,6 +14,6 @@ struct IndexController: RouteCollection {
     
     @Sendable
     private func getIndex(_ req: Request) async throws -> View {
-        try await req.htmlkit.render(IndexPage())
+        try await req.htmlkit.render(IndexPageV2.IndexView())
     }
 }

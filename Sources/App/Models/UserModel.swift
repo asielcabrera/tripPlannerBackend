@@ -15,6 +15,7 @@ struct UserModel {
         case administrator
         case moderator
         case customer
+        case driver
         
         var description: String {
             
@@ -27,6 +28,9 @@ struct UserModel {
                 
             case "customer":
                 return "Customer"
+                
+            case "driver":
+                return "Driver"
                 
             default:
                 return "Unkown"
@@ -54,6 +58,15 @@ struct UserModel {
         
         /// A permission role for the user
         let role: String
+        
+        init(avatarId: String? = nil, email: String, firstName: String? = nil, lastName: String? = nil, biography: String? = nil, role: String) {
+            self.avatarId = avatarId
+            self.email = email
+            self.firstName = firstName
+            self.lastName = lastName
+            self.biography = biography
+            self.role = role
+        }
         
         static func validations(_ validations: inout Validations) {
             
