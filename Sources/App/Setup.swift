@@ -77,7 +77,7 @@ enum Setup {
         
         try application.group("protected") { routes in
             
-            try application.register(collection: AuthController())
+            try application.register(collection: AuthAdminController())
             
             try routes.group("admin") { routes in
                 

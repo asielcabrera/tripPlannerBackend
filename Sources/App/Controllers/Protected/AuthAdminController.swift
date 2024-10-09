@@ -1,51 +1,47 @@
 //
-//  LoginAreaController.swift
+//  AuthController.swift
 //  trip-planner
 //
-//  Created by Asiel Cabrera Gonzalez on 10/7/24.
+//  Created by Asiel Cabrera Gonzalez on 10/8/24.
 //
 
 import HTMLKitVapor
 import Vapor
 
-// [/area/login]
-struct LoginAreaController {
-    
+struct AuthAdminController {
+   
     // [/]
     @Sendable
-    func getIndex(_ request: Request) async throws -> Response {
-        return request.redirect(to: "/area/login/login")
+    private func getIndex(_ req: Request) async throws -> Response {
+        return req.redirect(to: "/auth/login")
     }
-    
+   
     // [/login]
     @Sendable
-    func getLogin(_ request: Request) async throws -> View {
-        
-        // Create form token and store it to verify it in the post request
-        request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
+    private func getLogin(_ req: Request) async throws -> View {
+        req.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
         
         let viewModel = LoginAreaPageModel.LoginViewModel()
-        
-        return try await request.htmlkit.render(LoginAreaPage.LoginView(viewModel: viewModel))
+        return try await req.htmlkit.render(AuthenticationPage.LoginPageView())
     }
     
-    // [/login/:model]
+    // [/login/:model]'
     @Sendable
-    func postLogin(_ request: Request) async throws -> Response {
+    func postLogin(_ req: Request) async throws -> Response {
         
-        try LoginModel.Input.validate(content: request)
+        try LoginModel.Input.validate(content: req)
         
-        let login = try request.content.decode(LoginModel.Input.self)
+        let login = try req.content.decode(LoginModel.Input.self)
         
-        guard let nonce = request.application.htmlkit.environment.retrieve(for: \Nonce.self) as? Nonce else {
+        guard let nonce = req.application.htmlkit.environment.retrieve(for: \Nonce.self) as? Nonce else {
             throw Abort(.internalServerError)
         }
         
         try nonce.verify(nonce: login.nonce)
         
-        guard let user = try await UserRepository(database: request.db)
+        guard let user = try await UserRepository(database: req.db)
             .find(email: login.email) else {
-            return request.redirect(to: "/area/auth/login")
+            return req.redirect(to: "/auth/login")
         }
         
         // Check credential and the current status
@@ -57,65 +53,65 @@ struct LoginAreaController {
                 break
                 
             case "reseted":
-                return request.redirect(to: "/area/auth/\(try user.requireID())/reset")
+                return req.redirect(to: "/auth/\(try user.requireID())/reset")
                 
             default:
                 
-                if try await request.password.async.verify(login.password, created: credential.password) {
+                if try await req.password.async.verify(login.password, created: credential.password) {
                     
-                    request.session.authenticate(UserModel.Output(entity: user))
+                    req.session.authenticate(UserModel.Output(entity: user))
                     
                     // The attempt was successful, let's reset the counter
                     if credential.attempt > 0 {
                         // Reset the counter
-                        try await CredentialRepository(database: request.db)
+                        try await CredentialRepository(database: req.db)
                             .patch(field: \.$attempt, to: 0, for: credential.requireID())
                     }
             
-                    return request.redirect(to: "/area/admin/dashboard")
+                    return req.redirect(to: "/protected/admin/dashboard/")
                     
                 } else {
                     
                     // Track the attempt. If the maximum number of attempts is reached, lock the account
                     if credential.attempt < 4 {
                         // Increment the attempt count
-                        try await CredentialRepository(database: request.db)
+                        try await CredentialRepository(database: req.db)
                             .patch(field: \.$attempt, to: (credential.attempt + 1), for: credential.requireID())
                         
                     } else {
                         // Otherwise lock the account
-                        try await CredentialRepository(database: request.db)
+                        try await CredentialRepository(database: req.db)
                             .patch(field: \.$status, to: "locked", for: credential.requireID())
                     }
                 }
             }
             
         } else {
-            return request.redirect(to: "/area/auth/\(try user.requireID())/register")
+            return req.redirect(to: "/auth/\(try user.requireID())/register")
         }
         
-        return request.redirect(to: "/area/auth/login")
+        return req.redirect(to: "/auth/login")
     }
-    
+
     // [/logout]
     @Sendable
-    func getLogout(_ request: Request) async throws -> Response {
+    func getLogout(_ req: Request) async throws -> Response {
         
-        request.auth.logout(UserModel.Output.self)
-        request.session.unauthenticate(UserModel.Output.self)
+        req.auth.logout(UserModel.Output.self)
+        req.session.unauthenticate(UserModel.Output.self)
         
-        return request.redirect(to: "/area/auth/login")
+        return req.redirect(to: "/auth/login")
     }
     
     // [:id/register]
     @Sendable
-    func getRegister(_ request: Request) async throws -> View {
+    func getRegister(_ req: Request) async throws -> View {
         
-        guard let id = request.parameters.get("id", as: UUID.self) else {
+        guard let id = req.parameters.get("id", as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
-        guard let user = try await UserRepository(database: request.db)
+        guard let user = try await UserRepository(database: req.db)
             .find(id: id) else {
             throw Abort(.notFound)
         }
@@ -126,46 +122,46 @@ struct LoginAreaController {
         }
         
         // Create form token and store it to verify it in the post request
-        request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
+        req.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
         
-        return try await request.htmlkit.render(LoginAreaPage.RegisterView())
+        return try await req.htmlkit.render(AuthenticationPage.ResetPageView())
     }
     
     // [:id/register/:model]
     @Sendable
-    func postRegister(_ request: Request) async throws -> Response {
+    func postRegister(_ req: Request) async throws -> Response {
         
-        guard let id = request.parameters.get("id", as: UUID.self) else {
+        guard let id = req.parameters.get("id", as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
-        try ResetModel.Input.validate(content: request)
+        try ResetModel.Input.validate(content: req)
         
-        let reset = try request.content.decode(ResetModel.Input.self)
+        let reset = try req.content.decode(ResetModel.Input.self)
         
-        guard let nonce = request.application.htmlkit.environment.retrieve(for: \Nonce.self) as? Nonce else {
+        guard let nonce = req.application.htmlkit.environment.retrieve(for: \Nonce.self) as? Nonce else {
             throw Abort(.internalServerError)
         }
         
         try nonce.verify(nonce: reset.nonce)
         
-        let digest = try await request.password.async.hash(reset.password)
+        let digest = try await req.password.async.hash(reset.password)
         
-        try await CredentialRepository(database: request.db)
+        try await CredentialRepository(database: req.db)
             .insert(entity: CredentialEntity(password: digest, status: "unlocked", attempt: 0, userId: id))
         
-        return request.redirect(to: "/area/auth/login")
+        return req.redirect(to: "/auth/login")
     }
     
     // [:id/reset]
     @Sendable
-    func getReset(_ request: Request) async throws -> View {
+    func getReset(_ req: Request) async throws -> View {
         
-        guard let id = request.parameters.get("id", as: UUID.self) else {
+        guard let id = req.parameters.get("id", as: UUID.self) else {
             throw Abort(.badRequest)
         }
         
-        guard let user = try await UserRepository(database: request.db)
+        guard let user = try await UserRepository(database: req.db)
             .find(id: id) else {
             throw Abort(.notFound)
         }
@@ -179,9 +175,9 @@ struct LoginAreaController {
         }
         
         // Create form token and store it to verify it in the post request
-        request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
+        req.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
         
-        return try await request.htmlkit.render(LoginAreaPage.ResetView())
+        return try await req.htmlkit.render(AuthenticationPage.ResetPageView())
     }
     
     // [:id/reset/:model]
@@ -216,16 +212,13 @@ struct LoginAreaController {
                 .update(entity: credential, on: credential.requireID())
         }
         
-        return request.redirect(to: "/area/auth/login")
+        return request.redirect(to: "/auth/login")
     }
 }
 
-extension LoginAreaController: RouteCollection {
-    
+extension AuthAdminController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        
         routes.group("auth") { routes in
-            
             routes.get("", use: self.getIndex)
             routes.get("login", use: self.getLogin)
             routes.post("login", use: self.postLogin)

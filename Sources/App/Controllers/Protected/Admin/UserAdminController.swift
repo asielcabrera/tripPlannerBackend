@@ -8,7 +8,7 @@
 import HTMLKitVapor
 import Vapor
 
-// [/area/admin/users]
+// [/protected/admin/users]
 struct UserAdminController {
     
     // [/]
@@ -47,7 +47,7 @@ struct UserAdminController {
         try await UserRepository(database: request.db)
             .insert(entity: UserEntity(input: model))
         
-        return request.redirect(to: "/area/admin/users")
+        return request.redirect(to: "/protected/admin/users")
     }
     
     // [/edit/:id]
@@ -83,7 +83,7 @@ struct UserAdminController {
         try await UserRepository(database: request.db)
             .update(entity: UserEntity(input: model), on: id)
         
-        return request.redirect(to: "/area/admin/users")
+        return request.redirect(to: "/protected/admin/users")
     }
     
     // [/:id/delete]
@@ -97,7 +97,7 @@ struct UserAdminController {
         try await UserRepository(database: request.db)
             .delete(id: id)
         
-        return request.redirect(to: "/area/admin/users")
+        return request.redirect(to: "/protected/admin/users")
     }
     
     // MARK: [/:id/deactivate]
@@ -119,7 +119,7 @@ struct UserAdminController {
                 .patch(field: \.$status, to: "deactivated", for: credential.requireID())
         }
         
-        return request.redirect(to: "/area/admin/users/\(id)/edit")
+        return request.redirect(to: "/protected/admin/users/\(id)/edit")
     }
     
     // MARK: [/:id/unlock]
@@ -141,7 +141,7 @@ struct UserAdminController {
                 .patch(field: \.$status, to: "unlocked", for: credential.requireID())
         }
         
-        return request.redirect(to: "/area/admin/users/\(id)/edit")
+        return request.redirect(to: "/protected/admin/users/\(id)/edit")
     }
     
     // MARK: [/:id/reset]
@@ -163,7 +163,7 @@ struct UserAdminController {
                 .patch(field: \.$status, to: "reseted", for: credential.requireID())
         }
         
-        return request.redirect(to: "/area/admin/users/\(id)/edit")
+        return request.redirect(to: "/protected/admin/users/\(id)/edit")
     }
 }
 
