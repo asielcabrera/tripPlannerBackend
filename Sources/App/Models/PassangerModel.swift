@@ -1,33 +1,31 @@
 //
-//  DriverModel.swift
+//  PassangerModel.swift
 //  trip-planner
 //
-//  Created by Asiel Cabrera Gonzalez on 10/7/24.
+//  Created by Asiel Cabrera Gonzalez on 10/10/24.
 //
 
 import Vapor
 @preconcurrency import HTMLKitComponents
 
-struct DriverModel {
+struct PassangerModel {
     /// The data transfer object for the credential input
     struct Input: Content, Validatable {
         let firstName: String
         let lastName: String
-        let email: String
-        let role: String
+        let address: String
+        let assistence: [String]
         
         static func validations(_ validations: inout Validations) {
-            validations.add("email", as: String.self, is: .email)
             validations.add("lastName", as: String.self, is: .alphanumeric)
             validations.add("firstName", as: String.self, is: .alphanumeric)
-            validations.add("role", as: String.self, is: .alphanumeric)
+            validations.add("address", as: String.self, is: .alphanumeric)
+ 
         }
         
         static let validators = [
-            Validator(field: "email", rule: .email),
             Validator(field: "lastName", rule: .value),
             Validator(field: "firstName", rule: .value),
-            Validator(field: "role", rule: .value),
         ]
     }
     
@@ -37,21 +35,15 @@ struct DriverModel {
         /// The unique identifier of the user
         let id: UUID
         
-        /// The file name of the avatar
-        var avatar: AssetModel.Output?
-        
-        /// The email address of the user
-        let email: String
-        
         /// The first name of the user
         var firstName: String?
         
         /// The last name of the user
         var lastName: String?
        
-        /// The permission role of the user
-        let role: UserModel.Roles
-
+        var address: String
+        
+        var assistence: [String]
         /// A representation of the full name with the last name appearing first.
         var fullname: String? {
             
@@ -62,23 +54,20 @@ struct DriverModel {
             return nil
         }
         
-        init(id: UUID, avatar: AssetModel.Output? = nil, email: String, firstName: String? = nil, lastName: String? = nil, role: UserModel.Roles) {
+        init(id: UUID, firstName: String, lastName: String, address: String, assistence: [String]) {
             
             self.id = id
-            self.avatar = avatar
-            self.email = email
             self.firstName = firstName
             self.lastName = lastName
-            self.role = role
+            self.address = address
+            self.assistence = assistence
+
         }
         
-        init(entity: UserEntity) {
+        init(entity: PassangerEntity) {
             
-            self.init(id: entity.id!, email: entity.email, firstName: entity.firstName, lastName: entity.lastName, role: UserModel.Roles(rawValue: entity.role)!)
+            self.init(id: entity.id!, firstName: entity.firstName, lastName: entity.lastName, address: entity.address, assistence: entity.assistence)
             
-            if let avatar = entity.avatar {
-                self.avatar = AssetModel.Output(entity: avatar)
-            }
         }
     }
 }

@@ -39,7 +39,7 @@ final class AssistenceRepository {
     func update(entity: TripEntity, on id: UUID) async throws {
         try await database.query(TripEntity.self)
             .filter(\.$id == id)
-            .set(\.$title, to: entity.title)
+//            .set(\.$title, to: entity.title)
             .update()
     }
     func delete(id: UUID) async throws {

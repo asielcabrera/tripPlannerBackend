@@ -9,6 +9,8 @@ import protocol Vapor.Content
 
 enum AssistenceModel {
     struct Input: Content {
+        let firstName: String
+        let lastName: String
         
     }
     struct Output: Content {

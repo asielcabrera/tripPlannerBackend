@@ -40,9 +40,6 @@ final class UserEntity: Model, @unchecked Sendable {
     @Timestamp(key: "modified_at", on: .update)
     var modifiedAt: Date?
 
-//    @Children(for: \.$author)
-//    var articles: [ArticleEntity]
-    
     @OptionalChild(for: \.$user)
     var credential: CredentialEntity?
     

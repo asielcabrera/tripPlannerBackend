@@ -21,7 +21,7 @@ struct AuthAdminController {
     private func getLogin(_ req: Request) async throws -> View {
         req.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
         
-        let viewModel = LoginAreaPageModel.LoginViewModel()
+//        let viewModel = LoginAreaPageModel.LoginViewModel()
         return try await req.htmlkit.render(AuthenticationPage.LoginPageView())
     }
     

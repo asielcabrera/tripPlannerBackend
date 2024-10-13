@@ -5,7 +5,7 @@
 //  Created by Asiel Cabrera Gonzalez on 10/7/24.
 //
 
-enum  DashboardAdminPageModel {
+enum DashboardAdminPageModel {
     struct IndexView {
         let title: String = "Dashboard"
         let user: UserModel.Output

@@ -75,7 +75,7 @@ extension UserAdminPage {
     
     struct EditForm: View {
         
-        var user: UserModel.Output
+        var user: UserEntity
         
         var body: Content {
             Form(method: .post) {

@@ -7,7 +7,7 @@
 import HTMLKit
 import HTMLKitComponents
 
-enum TripAdminPage {
+enum TripAdminPagev1 {
     struct IndexView: View {
         var body: Content {
             AreaViewContainer {

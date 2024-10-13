@@ -20,6 +20,6 @@ enum UserAdminPageModel {
     
     struct EditView {
         let title: String = "Edit user"
-        let user: UserModel.Output
+        let user: UserEntity
     }
 }

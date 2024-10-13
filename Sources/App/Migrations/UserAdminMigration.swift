@@ -11,11 +11,11 @@ struct UserAdminMigration: AsyncMigration {
     
     func prepare(on database: Database) async throws {
         
-        let userEntity = UserEntity(email: "admin@admin.com", role: "Administrator")
+        let userEntity = UserEntity(email: "admin@admin.com", firstName: "Admin", role: "Administrator")
         
         try await UserRepository(database: database)
             .insert(entity: userEntity)
-            
+        
     }
     
     func revert(on database: Database) async throws {

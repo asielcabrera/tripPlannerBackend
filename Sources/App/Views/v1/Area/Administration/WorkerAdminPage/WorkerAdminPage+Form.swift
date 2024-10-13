@@ -93,7 +93,7 @@ extension WorkerAdminPage {
                         FieldLabel(for: "role") {
                             "Role"
                         }
-                        SelectField(name: "role", prompt: "Role", selection: driver.role) {
+                        SelectField(name: "role", prompt: "Role", selection: driver.role.description) {
                             for role in UserModel.Roles.allCases {
                                 RadioSelect(value: role.rawValue) {
                                     role.description

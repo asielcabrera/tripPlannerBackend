@@ -15,11 +15,14 @@ final class TripEntity: Model, @unchecked Sendable {
     @ID
     var id: UUID?
     
-    @Field(key: "title")
-    var title: String
+    @Timestamp(key: "forDay", on: .none)
+    var forDay: Date?
     
-    @Field(key: "fileName")
-    var fileName: String?
+    @OptionalField(key: "passangers")
+    var passangers: [PassangerEntity]?
+    
+    @Field(key: "status")
+    var status: TripModel.TripStatus
     
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
@@ -29,14 +32,18 @@ final class TripEntity: Model, @unchecked Sendable {
     
     init() { }
     
-    init(id: UUID? = nil, title: String, createdAt: Date? = nil, modifiedAt: Date? = nil) {
+    init(id: UUID? = nil, forDay: Date, passangers: [PassangerEntity]? = nil, status: TripModel.TripStatus, createdAt: Date? = nil, modifiedAt: Date? = nil) {
         self.id = id
-        self.title = title
+        self.forDay = forDay
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
     }
     
     convenience init(input: TripModel.Input) {
-        self.init(title: "")
+        self.init(forDay: input.forDay, status: input.status)
+        
+        let passangerInputs = input.passangers.map(PassangerEntity.init)
+        self.passangers = passangerInputs
     }
 }
+

@@ -63,7 +63,7 @@ struct UserAdminController {
             throw Abort(.notFound)
         }
         
-        let viewModel = UserAdminPageModel.EditView(user: UserModel.Output(entity: entity))
+        let viewModel = UserAdminPageModel.EditView(user: entity)
         
         return try await request.htmlkit.render(UserAdminPage.EditView(viewModel: viewModel))
     }

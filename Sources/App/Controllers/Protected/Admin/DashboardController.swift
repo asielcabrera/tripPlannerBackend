@@ -12,9 +12,8 @@ struct DashboardController {
     // [/]
     @Sendable
     func getIndex(_ request: Request) async throws -> View {
-        let user: UserModel.Output = try request.auth.require()
-        let viewModel = DashboardAdminPageModel.IndexView(user: user)
-//        return try await request.htmlkit.render(DashboardPage.IndexView(viewModel: viewModel))
+//        let user: UserModel.Output = try request.auth.require()
+//        let viewModel = DashboardAdminPageModel.IndexView(user: user)
         return try await request.htmlkit.render(DashboardAdminPage.IndexView())
     }
 }

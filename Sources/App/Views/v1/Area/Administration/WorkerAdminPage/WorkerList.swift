@@ -23,7 +23,7 @@ struct WorkerList: View {
                         .frame(width: .four)
                         .lineLimit(.one)
                         Text {
-                            if let role = UserModel.Roles(rawValue: driver.role) {
+                            if let role = UserModel.Roles(rawValue: driver.role.description) {
                                 role.description
                             }
                         }

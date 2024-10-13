@@ -12,7 +12,7 @@ struct AssistenceAdminController {
     // [/]
     @Sendable
     func getIndex(_ request: Request) async throws -> View {
-        let user: UserModel.Output = try request.auth.require()
+//        let user: UserModel.Output = try request.auth.require()
         return try await request.htmlkit.render(AssistenceAdminPage.IndexView())
     }
 }

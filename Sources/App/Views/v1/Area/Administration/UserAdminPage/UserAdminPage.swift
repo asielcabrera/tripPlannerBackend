@@ -88,11 +88,11 @@ enum UserAdminPage {
                         .fontWeight(.medium)
                         Dropdown {
                             List(direction: .vertical) {
-                                Link(destination: "/area/admin/users/\(viewModel.user.id)/unlock/") {
+                                Link(destination: "/area/admin/users/\(String(describing: viewModel.user.id))/unlock/") {
                                     Symbol(system: .key)
                                     Text("action.unlock")
                                 }
-                                Link(destination: "/area/admin/users/\(viewModel.user.id)/reset/") {
+                                Link(destination: "/area/admin/users/\(String(describing: viewModel.user.id))/reset/") {
                                     Symbol(system: .key)
                                     Text("action.reset")
                                 }
@@ -122,7 +122,7 @@ enum UserAdminPage {
                         UserAdminPage.EditForm(user: viewModel.user)
                     }
                 }
-                UserAdminPage.DeleteModal(id: viewModel.user.id)
+                UserAdminPage.DeleteModal(id: viewModel.user.id!)
             }
         }
     }

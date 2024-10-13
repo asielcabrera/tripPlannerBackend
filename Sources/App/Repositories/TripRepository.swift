@@ -38,8 +38,9 @@ final class TripRepository: Repository {
     func update(entity: TripEntity, on id: UUID) async throws {
         try await database.query(TripEntity.self)
             .filter(\.$id == id)
-            .set(\.$title, to: entity.title)
-         
+            .set(\.$forDay, to: entity.forDay)
+            .set(\.$passangers, to: entity.passangers)
+            .set(\.$status, to: entity.status)
             .update()
     }
     func delete(id: UUID) async throws {

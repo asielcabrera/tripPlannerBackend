@@ -81,12 +81,12 @@ enum Setup {
             
             try routes.group("admin") { routes in
                 
-                let group = routes.grouped(UserSessionAuthenticator(), UserModel.Output.redirectMiddleware(path: "/protected/auth/login"))
+                let group = routes.grouped(UserSessionAuthenticator(), UserModel.Output.redirectMiddleware(path: "/auth/login"))
                 try group.register(collection: DashboardController())
-//                try group.register(collection: DriverAdminController())
+                try group.register(collection: DriverAdminController())
 //                try group.register(collection: TripAdminController())
 //                try group.register(collection: AssistenceAdminController())
-//                try group.register(collection: PassangerAdminController())
+                try group.register(collection: PassangerAdminController())
 //                try group.register(collection: AssistenceAdminController())
 //                try group.register(collection: UserAdminController())
             }
@@ -118,7 +118,8 @@ enum Setup {
         application.migrations.add(SessionRecord.migration)
         application.migrations.add(CredentialMigration())
         application.migrations.add(UserAdminMigration())
-        
+        application.migrations.add(PassangerMigration())
+        application.migrations.add(TripMigration())
         //        application.migrations.add(ArticleMigration())
         //        application.migrations.add(ProjectMigration())
         //        application.migrations.add(CommentMigration())

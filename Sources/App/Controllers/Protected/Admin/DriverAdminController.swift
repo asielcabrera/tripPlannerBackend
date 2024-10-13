@@ -8,6 +8,8 @@ import Vapor
 import HTMLKitVapor
 
 struct DriverAdminController {
+    
+    // [/]
     @Sendable
     func listDriver(_ request: Request) async throws -> View {
        
@@ -16,44 +18,104 @@ struct DriverAdminController {
         request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
         
         let pagination = try await UserRepository(database: request.db)
-            .find(role: .driver)
-            .map(DriverModel.Output.init)
+            .find()
+            .map(UserModel.Output.init)
             .page(page: page, per: 10)
         
         let user = try request.auth.require(UserModel.Output.self)
-        let viewModel = WorkerAdminPageModel.IndexView(user: user, pagination: pagination)
-        return try await request.htmlkit.render(WorkerAdminPage.IndexView(viewModel: viewModel))
+        let viewModel = DriverAdminPageModel.IndexView(user: user, pagination: pagination)
+        
+        return try await request.htmlkit.render(DriversAdminPage.IndexView(viewModel: viewModel))
     }
     
+    // [/create]
     @Sendable
     func createDriverView(_ request: Request) async throws -> View {
-        let viewModel = WorkerAdminPageModel.CreateView()
         request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
-        return try await request.htmlkit.render(WorkerAdminPage.CreateView(viewModel: viewModel))
+        return try await request.htmlkit.render(DriversAdminPage.CreateView())
     }
     
     // [/create/:model]
     @Sendable
     func createDriver(_ request: Request) async throws -> Response {
+        
+        print(request.body)
+        
+        
         try DriverModel.Input.validate(content: request)
         
         let model = try request.content.decode(DriverModel.Input.self)
         
-        let user = UserModel.Input(email: model.username, firstName: model.firstName, lastName: model.lastName ,role: model.role)
-        
+        let user = UserModel.Input(email: model.email, firstName: model.firstName, lastName: model.lastName ,role: model.role)
+
         try await UserRepository(database: request.db)
             .insert(entity: UserEntity(input: user))
         request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
-        return request.redirect(to: "/area/admin/workers")
+        return request.redirect(to: "/protected/admin/drivers")
+    }
+    
+    
+    
+    // [/create]
+    @Sendable
+    func editDriverView(_ request: Request) async throws -> View {
+        guard let id = request.parameters.get("id", as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+        guard let entity = try await UserRepository(database: request.db)
+            .find(id: id) else {
+            throw Abort(.notFound)
+        }
+        
+        let viewModel = UserAdminPageModel.EditView(user: entity)
+        
+        request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
+        return try await request.htmlkit.render(DriversAdminPage.EditView(viewModel: viewModel))
+    }
+    
+    // [/create/:model]
+    @Sendable
+    func editDriver(_ request: Request) async throws -> Response {
+        guard let id = request.parameters.get("id", as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+        
+        try DriverModel.Input.validate(content: request)
+        
+        let model = try request.content.decode(UserModel.Input.self)
+        
+        let userEntity =  UserEntity(input: model)
+         
+        try await UserRepository(database: request.db).update(entity: userEntity, on: id)
+        
+        
+        request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
+        return request.redirect(to: "/protected/admin/drivers")
+    }
+    
+    // [/delete/:model]
+    @Sendable
+    func deleteDriver(_ request: Request) async throws -> Response {
+        guard let id = request.parameters.get("id", as: UUID.self) else {
+            throw Abort(.badRequest)
+        }
+        
+        try await UserRepository(database: request.db).delete(id: id)
+        
+        request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
+        return request.redirect(to: "/protected/admin/drivers")
     }
 }
 
 extension DriverAdminController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        routes.group("workers") { routes in
+        routes.group("drivers") { routes in
             routes.get("", use: self.listDriver)
             routes.get("create", use: self.createDriverView)
             routes.post("create", use: self.createDriver)
+            routes.get("edit", ":id", use: self.editDriverView)
+            routes.post("edit", ":id", use: self.editDriver)
+            routes.get("delete", ":id", use: self.deleteDriver)
         }
     }
 }
