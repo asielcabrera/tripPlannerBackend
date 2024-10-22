@@ -75,6 +75,10 @@ enum Setup {
         //        try application.register(collection: PrivacyPageController())
         //        try application.register(collection: LegalPageController())
         
+        try application.group("api") { routes in
+            try routes.register(collection: TripApiController())
+        }
+        
         try application.group("protected") { routes in
             
             try application.register(collection: AuthAdminController())
@@ -82,9 +86,10 @@ enum Setup {
             try routes.group("admin") { routes in
                 
                 let group = routes.grouped(UserSessionAuthenticator(), UserModel.Output.redirectMiddleware(path: "/auth/login"))
+                group.get("", use: { req in req.redirect(to: "/protected/admin/dashboard", redirectType: .normal)})
                 try group.register(collection: DashboardController())
                 try group.register(collection: DriverAdminController())
-//                try group.register(collection: TripAdminController())
+                try group.register(collection: TripAdminController())
 //                try group.register(collection: AssistenceAdminController())
                 try group.register(collection: PassangerAdminController())
 //                try group.register(collection: AssistenceAdminController())
@@ -112,7 +117,7 @@ enum Setup {
         ), as: .psql)
         
         //
-        //
+        
         application.migrations.add(AssetMigration())
         application.migrations.add(UserMigration())
         application.migrations.add(SessionRecord.migration)
@@ -120,6 +125,9 @@ enum Setup {
         application.migrations.add(UserAdminMigration())
         application.migrations.add(PassangerMigration())
         application.migrations.add(TripMigration())
+        application.migrations.add(TripPassengerMigration())
+        application.migrations.add(TripSampleDataMigration())
+        
         //        application.migrations.add(ArticleMigration())
         //        application.migrations.add(ProjectMigration())
         //        application.migrations.add(CommentMigration())

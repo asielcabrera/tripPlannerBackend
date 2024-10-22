@@ -15,11 +15,11 @@ final class TripEntity: Model, @unchecked Sendable {
     @ID
     var id: UUID?
     
-    @Timestamp(key: "forDay", on: .none)
-    var forDay: Date?
+    @Field(key: "forDay")
+    var forDay: String
     
-    @OptionalField(key: "passangers")
-    var passangers: [PassangerEntity]?
+    @Siblings(through: TripPassangerEntity.self, from: \.$trip, to: \.$passanger) // Relación muchos a muchos
+    var passengers: [PassangerEntity]
     
     @Field(key: "status")
     var status: TripModel.TripStatus
@@ -32,18 +32,16 @@ final class TripEntity: Model, @unchecked Sendable {
     
     init() { }
     
-    init(id: UUID? = nil, forDay: Date, passangers: [PassangerEntity]? = nil, status: TripModel.TripStatus, createdAt: Date? = nil, modifiedAt: Date? = nil) {
+    init(id: UUID? = nil, forDay: Date, status: TripModel.TripStatus, createdAt: Date? = nil, modifiedAt: Date? = nil) {
         self.id = id
-        self.forDay = forDay
+        self.forDay = forDay.formatted(date: .medium, time: .none)
+        self.status = status
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
     }
     
     convenience init(input: TripModel.Input) {
         self.init(forDay: input.forDay, status: input.status)
-        
-        let passangerInputs = input.passangers.map(PassangerEntity.init)
-        self.passangers = passangerInputs
     }
 }
 

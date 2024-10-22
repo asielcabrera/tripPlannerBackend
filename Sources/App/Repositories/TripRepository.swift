@@ -20,11 +20,23 @@ final class TripRepository: Repository {
     func find(id: UUID) async throws -> TripEntity? {
         try await TripEntity.find(id, on: self.database)
     }
-
+    
     func find() async throws -> [TripEntity] {
         try await TripEntity.query(on: self.database)
             .all()
     }
+    
+    func find(week: Int, year: Int) async throws -> [TripEntity] {
+        
+        let dates = Date.getWeekDay(forWeek: week, year: year)
+
+        return try await TripEntity.query(on: self.database)
+            .filter(\.$forDay ~~ dates)
+            .with(\.$passengers)
+            .all()
+    }
+    
+    
     func insert(entity: TripEntity) async throws {
         try await entity.save(on: self.database)
     }
@@ -39,7 +51,7 @@ final class TripRepository: Repository {
         try await database.query(TripEntity.self)
             .filter(\.$id == id)
             .set(\.$forDay, to: entity.forDay)
-            .set(\.$passangers, to: entity.passangers)
+        //            .set(\.$passangers, to: entity.passangers)
             .set(\.$status, to: entity.status)
             .update()
     }

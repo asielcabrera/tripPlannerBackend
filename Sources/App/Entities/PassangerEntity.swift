@@ -10,7 +10,7 @@ import Foundation
 
 final class PassangerEntity: Model, @unchecked Sendable {
     
-    static let schema = "passangers"
+    static let schema = "passengers"
     
     @ID
     var id: UUID?
@@ -26,6 +26,9 @@ final class PassangerEntity: Model, @unchecked Sendable {
     
     @Field(key: "assistence")
     var assistence: [String]
+    
+    @Siblings(through: TripPassangerEntity.self, from: \.$passanger, to: \.$trip) // Relación muchos a muchos
+        var trips: [TripEntity]
     
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?

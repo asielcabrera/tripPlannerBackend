@@ -9,10 +9,12 @@ import HTMLKit
 
 enum DashboardAdminPage {
     struct BaseDashboardAdminPage: View {
+        let button: String?
         var content: [BodyElement]
         
         
-        init(_ title: String, @ContentBuilder<BodyElement> content: () -> [BodyElement]) {
+        init(_ button: String? = nil, @ContentBuilder<BodyElement> content: () -> [BodyElement]) {
+            self.button = button
             self.content = content()
         }
         
@@ -20,7 +22,7 @@ enum DashboardAdminPage {
             BaseContaiterView {
                 Div {
                     
-                    DashboardAdminPage.NavbarView()
+                    DashboardAdminPage.NavbarView(button: button)
                     DashboardAdminPage.SideBarView()
                     
                     Main {
@@ -38,13 +40,16 @@ enum DashboardAdminPage {
     
     struct IndexView: View {
         var body: Content {
-            BaseDashboardAdminPage("Dashboard") {
+            BaseDashboardAdminPage {
                 
             }
         }
     }
         
     struct NavbarView: View {
+        
+        let button: String?
+        
         var body: Content {
             Nav {
                 Div {
@@ -91,11 +96,11 @@ enum DashboardAdminPage {
                                 .alternate("Website Logo")
 
                             Span {
-                                "DashBoard"
+                                "TripPlanner"
                             }
                             .class("self-center text-2xl font-semibold whitespace-nowrap dark:text-white")
                         }
-                        .reference("/")
+                        .reference("/protected/admin")
                         .class("flex items-center justify-between mr-4")
                         
                         Form {
@@ -135,7 +140,7 @@ enum DashboardAdminPage {
                         
                     }.class("flex justify-start items-center")
                     
-                    NotificationView()
+                    NotificationView(button: button)
                 }
                 .class("flex flex-wrap justify-between items-center")
             }
@@ -153,7 +158,7 @@ enum DashboardAdminPage {
         
         let sideBarMenus: [SideBarMenu] = [
             .init(name: "Overview", path: "/protected/admin/dashboard", count: nil),
-            .init(name: "Drivers", path: "/protected/admin/drivers", count: "45"),
+            .init(name: "Drivers", path: "/protected/admin/workers", count: "45"),
             .init(name: "Passangers", path: "/protected/admin/passangers", count: nil),
             .init(name: "Assistence", path: "/protected/admin/assistence", count: nil),
             .init(name: "Trips", path: "/protected/admin/trips", count: nil),
@@ -340,6 +345,8 @@ enum DashboardAdminPage {
     }
     
     struct NotificationView: View {
+        let button: String?
+        
         var body: Content {
             Div {
                 Button {
@@ -357,21 +364,25 @@ enum DashboardAdminPage {
                 .type(.button)
                 .class("p-2 mr-1 text-gray-500 rounded-lg md:hidden hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600")
                 
-                Button {
-                    Svg {
-                        Path {}
-                            .custom(key: "clip-rule", value: "evenodd")
-                            .custom(key: "fill-rule", value: "evenodd")
-                            .draw("M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z")
+                if let button = button {
+                    A {
+                        Svg {
+                            Path {}
+                                .custom(key: "clip-rule", value: "evenodd")
+                                .custom(key: "fill-rule", value: "evenodd")
+                                .draw("M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z")
+                        }
+                        
+                        .class("mr-1 -ml-1 w-5 h-5")
+                        .fill("currentColor")
+                        .viewBox("0 0 20 20")
+                        
+                        " New \(button)"
                     }
-                    .class("mr-1 -ml-1 w-5 h-5")
-                    .fill("currentColor")
-                    .viewBox("0 0 20 20")
-                    
-                    " New Note"
+                    .reference("/protected/admin/\(button.lowercased())/create")
+                    .type("button")
+                    .class("hidden sm:inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800")
                 }
-                .type(.button)
-                .class("hidden sm:inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800")
                 
                 // Notifications
                 Button {

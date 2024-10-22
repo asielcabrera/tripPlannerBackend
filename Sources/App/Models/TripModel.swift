@@ -17,17 +17,20 @@ enum TripModel {
     struct Input: Content {
         let forDay: Date
         let status: TripStatus
-        let passangers: [PassangerModel.Input]
-        
+        let passangers: [PassangerModel.Input]?
     }
     
-    struct Output: Content {
+    struct Output: Content, Equatable {
+        static func == (lhs: TripModel.Output, rhs: TripModel.Output) -> Bool {
+            lhs.id == rhs.id
+        }
+        
         let id: UUID
         var forDay: Date
         var status: TripStatus
-        var passangers: [PassangerModel.Output]?
+        var passangers: [PassangerModel.Output]
         
-        init(id: UUID, forDay: Date, status: TripStatus, passangers: [PassangerModel.Output]? = nil) {
+        init(id: UUID, forDay: Date, status: TripStatus, passangers: [PassangerModel.Output]) {
             self.id = id
             self.forDay = forDay
             self.status = status
@@ -35,14 +38,15 @@ enum TripModel {
         }
         
         init(tripEntity: TripEntity) throws {
+            self.id = try tripEntity.requireID()
             
-            self.init(id: try tripEntity.requireID(), forDay: tripEntity.forDay!, status: tripEntity.status)
-      
-            if let passangerEntities = tripEntity.passangers {
-                self.passangers = passangerEntities.map({ passangerEntity in
-                    return PassangerModel.Output(entity: passangerEntity)
-                })
-            }
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            
+            self.forDay = dateFormatter.date(from: tripEntity.forDay) ?? .now
+            self.status = tripEntity.status
+            
+            self.passangers = try tripEntity.passengers.map { try PassangerModel.Output(entity: $0)}
         }
     }
 }

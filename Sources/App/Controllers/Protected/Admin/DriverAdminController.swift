@@ -51,7 +51,7 @@ struct DriverAdminController {
         try await UserRepository(database: request.db)
             .insert(entity: UserEntity(input: user))
         request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
-        return request.redirect(to: "/protected/admin/drivers")
+        return request.redirect(to: "/protected/admin/workers")
     }
     
     
@@ -90,7 +90,7 @@ struct DriverAdminController {
         
         
         request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
-        return request.redirect(to: "/protected/admin/drivers")
+        return request.redirect(to: "/protected/admin/workers")
     }
     
     // [/delete/:model]
@@ -103,13 +103,13 @@ struct DriverAdminController {
         try await UserRepository(database: request.db).delete(id: id)
         
         request.application.htmlkit.environment.upsert(Nonce(), for: \Nonce.self)
-        return request.redirect(to: "/protected/admin/drivers")
+        return request.redirect(to: "/protected/admin/workers")
     }
 }
 
 extension DriverAdminController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        routes.group("drivers") { routes in
+        routes.group("workers") { routes in
             routes.get("", use: self.listDriver)
             routes.get("create", use: self.createDriverView)
             routes.post("create", use: self.createDriver)

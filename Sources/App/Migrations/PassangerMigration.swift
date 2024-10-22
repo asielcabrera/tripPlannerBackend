@@ -11,7 +11,7 @@ struct PassangerMigration: AsyncMigration {
     
     func prepare(on database: Database) async throws {
         
-        try await database.schema("passangers")
+        try await database.schema("passengers")
             .id()
             .field("firsName", .string, .required)
             .field("lastName", .string, .required)

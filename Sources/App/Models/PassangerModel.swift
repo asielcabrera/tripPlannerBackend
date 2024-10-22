@@ -31,27 +31,15 @@ struct PassangerModel {
     
     /// The data transfer object for the credential entity
     struct Output: Content {
-        
-        /// The unique identifier of the user
         let id: UUID
-        
-        /// The first name of the user
-        var firstName: String?
-        
-        /// The last name of the user
-        var lastName: String?
-       
+        var firstName: String
+        var lastName: String
         var address: String
-        
         var assistence: [String]
-        /// A representation of the full name with the last name appearing first.
-        var fullname: String? {
-            
-            if let firstName, let lastName {
-                return firstName + " " + lastName
-            }
-            
-            return nil
+       
+        
+        var fullname: String {
+            return firstName + " " + lastName
         }
         
         init(id: UUID, firstName: String, lastName: String, address: String, assistence: [String]) {
@@ -64,10 +52,12 @@ struct PassangerModel {
 
         }
         
-        init(entity: PassangerEntity) {
-            
-            self.init(id: entity.id!, firstName: entity.firstName, lastName: entity.lastName, address: entity.address, assistence: entity.assistence)
-            
+        init(entity: PassangerEntity) throws {
+            self.id = try entity.requireID()
+            self.firstName = entity.firstName
+            self.lastName = entity.lastName
+            self.address = entity.address
+            self.assistence = entity.assistence
         }
     }
 }

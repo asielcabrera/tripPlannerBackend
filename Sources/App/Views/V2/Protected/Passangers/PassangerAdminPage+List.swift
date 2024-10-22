@@ -106,7 +106,7 @@ extension PassangerAdminPage {
                     
                     Div {
                         Div {
-                            "\(passanger.fullname ?? "")"
+                            "\(passanger.fullname)"
                         }
                         .class("text-base font-semibold")
                         

@@ -13,8 +13,7 @@ struct TripMigration: AsyncMigration {
         
         try await database.schema("trips")
             .id()
-            .field("forDay", .date, .required)
-            .field("passangers", .array(of: .custom(PassangerEntity.self)), .required)
+            .field("forDay", .string, .required)
             .field("status", .string, .required)
             .field("created_at", .datetime)
             .field("modified_at", .datetime)
@@ -23,7 +22,7 @@ struct TripMigration: AsyncMigration {
     
     func revert(on database: Database) async throws {
         
-        try await database.schema("passangers")
+        try await database.schema("trips")
             .delete()
     }
 }
